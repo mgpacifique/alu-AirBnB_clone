@@ -37,22 +37,38 @@ class FileStorage:
 
     def reload(self):
         """Deserializes the JSON file to __objects, if the file exists"""
-        from models.user import User
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.place import Place
-        from models.review import Review
+        classes = {"BaseModel": BaseModel}
+        try:
+            from models.user import User
+            classes["User"] = User
+        except ImportError:
+            pass
+        try:
+            from models.state import State
+            classes["State"] = State
+        except ImportError:
+            pass
+        try:
+            from models.city import City
+            classes["City"] = City
+        except ImportError:
+            pass
+        try:
+            from models.amenity import Amenity
+            classes["Amenity"] = Amenity
+        except ImportError:
+            pass
+        try:
+            from models.place import Place
+            classes["Place"] = Place
+        except ImportError:
+            pass
+        try:
+            from models.review import Review
+            classes["Review"] = Review
+        except ImportError:
+            pass
 
-        classes = {
-            "BaseModel": BaseModel,
-            "User": User,
-            "State": State,
-            "City": City,
-            "Amenity": Amenity,
-            "Place": Place,
-            "Review": Review
-        }
         if os.path.exists(FileStorage.__file_path):
             with open(FileStorage.__file_path, 'r', encoding='utf-8') as f:
                 try:
@@ -62,5 +78,5 @@ class FileStorage:
                         if class_name in classes:
                             obj = classes[class_name](**value)
                             FileStorage.__objects[key] = obj
-                except json.JSONDecodeError:
+                except Exception:
                     pass
