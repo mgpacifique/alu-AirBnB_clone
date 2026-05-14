@@ -59,7 +59,8 @@ class FileStorage:
                     obj_dict = json.load(f)
                     for key, value in obj_dict.items():
                         class_name = value['__class__']
-                        if class_name == "BaseModel":
-                            FileStorage.__objects[key] = BaseModel(**value)
+                        if class_name in classes:
+                            obj = classes[class_name](**value)
+                            FileStorage.__objects[key] = obj
                 except json.JSONDecodeError:
                     pass
