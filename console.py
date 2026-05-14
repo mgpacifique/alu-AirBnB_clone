@@ -42,6 +42,75 @@ class HBNBCommand(cmd.Cmd):
         """Do Nothing upon receiving an empty line"""
         pass
 
+    def default(self, line):
+        """Called on an input line when the command prefix is not recognized"""
+        import re
+        import ast
+
+        match = re.match(r"^(\w+)\.(\w+)\((.*)\)$", line)
+        if match:
+            class_name = match.group(1)
+            method = match.group(2)
+            args_str = match.group(3)
+
+            if class_name in self.classes:
+                if method == "all":
+                    return self.do_all(class_name)
+                elif method == "count":
+                    count = sum(1 for key in storage.all()
+                                if key.startswith(class_name + "."))
+                    print(count)
+                    return
+                elif method == "show":
+                    args_str = args_str.strip('"\' ')
+                    return self.do_show("{} {}".format(class_name, args_str))
+                elif method == "destroy":
+                    args_str = args_str.strip('"\' ')
+                    return self.do_destroy(
+                        "{} {}".format(class_name, args_str))
+                elif method == "update":
+                    dict_match = re.search(r'\{.*\}', args_str)
+                    if dict_match:
+                        id_str = args_str[:args_str.find(',')]
+                        id_str = id_str.strip('"\' ')
+                        d_str = dict_match.group(0)
+                        try:
+                            d = ast.literal_eval(d_str)
+                            if type(d) is dict:
+                                key = "{}.{}".format(class_name, id_str)
+                                if key in storage.all():
+                                    obj = storage.all()[key]
+                                    for k, v in d.items():
+                                        setattr(obj, k, v)
+                                    obj.save()
+                                else:
+                                    print("** no instance found **")
+                                return
+                        except Exception:
+                            pass
+                    else:
+                        args = args_str.split(',')
+                        if len(args) >= 1:
+                            id_str = args[0].strip('"\' ')
+                            if len(args) == 1:
+                                return self.do_update(
+                                    "{} {}".format(class_name, id_str))
+                            elif len(args) == 2:
+                                attr_name = args[1].strip('"\' ')
+                                return self.do_update(
+                                    "{} {} {}".format(
+                                        class_name, id_str, attr_name))
+                            elif len(args) >= 3:
+                                attr_name = args[1].strip('"\' ')
+                                attr_val = args[2].strip('"\' ')
+                                return self.do_update(
+                                    "{} {} {} {}".format(
+                                        class_name, id_str,
+                                        attr_name, attr_val))
+
+        print("*** Unknown syntax: {}".format(line))
+        return False
+
     def do_create(self, arg):
         """Creates a new instance of a class, saves it and prints the id"""
         args = arg.split()
