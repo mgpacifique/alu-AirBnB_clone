@@ -54,6 +54,42 @@ class TestConsole(unittest.TestCase):
             self.console.onecmd("create User")
             self.assertTrue(len(f.getvalue().strip()) > 0)
 
+    def test_advanced_features(self):
+        """Test the advanced features of the console"""
+        cmds = [
+            "BaseModel.all()", "User.all()", "State.all()",
+            "City.all()", "Amenity.all()", "Place.all()", "Review.all()",
+            "BaseModel.count()", "User.count()", "State.count()",
+            "City.count()", "Amenity.count()", "Place.count()",
+            "Review.count()",
+            "BaseModel.show(\"id\")", "User.show(\"id\")",
+            "State.show(\"id\")", "City.show(\"id\")",
+            "Amenity.show(\"id\")", "Place.show(\"id\")",
+            "Review.show(\"id\")",
+            "BaseModel.destroy(\"id\")", "User.destroy(\"id\")",
+            "City.destroy(\"id\")", "State.destroy(\"id\")",
+            "Place.destroy(\"id\")", "Amenity.destroy(\"id\")",
+            "Review.destroy(\"id\")",
+            "BaseModel.update(\"id\", \"attribute_name\", \"string_value\")",
+            "User.update(\"id\", \"attribute_name\", \"string_value\")",
+            "State.update(\"id\", \"attribute_name\", \"string_value\")",
+            "City.update(\"id\", \"attribute_name\", \"string_value\")",
+            "Place.update(\"id\", \"attribute_name\", \"string_value\")",
+            "Amenity.update(\"id\", \"attribute_name\", \"string_value\")",
+            "Review.update(\"id\", \"attribute_name\", \"string_value\")",
+            "BaseModel.update(\"id\", {'first_name': \"John\"})",
+            "User.update(\"id\", {'first_name': \"John\"})",
+            "State.update(\"id\", {'first_name': \"John\"})",
+            "Amenity.update(\"id\", {'first_name': \"John\"})",
+            "City.update(\"id\", {'first_name': \"John\"})",
+            "Place.update(\"id\", {'first_name': \"John\"})",
+            "Review.update(\"id\", {'first_name': \"John\"})"
+        ]
+        for cmd in cmds:
+            with patch('sys.stdout', new=StringIO()) as f:
+                self.console.onecmd(cmd)
+                self.assertEqual(type(f.getvalue()), str)
+
 
 if __name__ == "__main__":
     unittest.main()
